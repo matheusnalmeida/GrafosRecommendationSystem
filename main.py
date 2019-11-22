@@ -2,6 +2,7 @@ import pandas as pd
 from geradorDeMatriz import geradorDeMatriz
 import time
 from filme import Filme
+from pprint import pprint
 
 if __name__ == "__main__":
     dataFilme = pd.read_csv("ml-latest-small\\movies.csv") 
@@ -20,12 +21,10 @@ if __name__ == "__main__":
 
     idDoUsuario = input("Digite o id do usuario que deseja buscar os filmes melhores avaliados: ")
     dicionarioDeFilmesMelhoresAvaliados = geradorDeMatriz.retornaFilmesComMaiorNota(idDoUsuario)
+    categoriasMelhoresAvaliadas = geradorDeMatriz.retornarCategoriasMelhoresAvaliadas(dicionarioDeFilmesMelhoresAvaliados)
     
-    for i in dicionarioDeFilmesMelhoresAvaliados:
-        print("%s = " % i,end="")
-        for y in dicionarioDeFilmesMelhoresAvaliados.get(i):
-            print(y, end= ' ')
-        print()
+    for i in categoriasMelhoresAvaliadas:
+        pprint(i)
 
     temp = fim - inicio
     hours = temp//3600

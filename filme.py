@@ -3,9 +3,10 @@ class Filme:
         self.id = id
         self.nomeDoFilme = nomeDoFilme
         self.genero = generos
-    
 
-
+    def getListaDeGeneros(self):
+        return self.genero
+        
     def __str__(self):
         return self.nomeDoFilme
     
