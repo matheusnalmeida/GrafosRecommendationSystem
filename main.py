@@ -7,13 +7,13 @@ from pprint import pprint
 if __name__ == "__main__":
     dataFilme = pd.read_csv("ml-latest-small\\movies.csv") 
     dataUsuarios =  pd.read_csv("ml-latest-small\\ratings.csv") 
-    filmeTEsT = Filme(1,"Aldo",2)
-    filmeTEsT2 = Filme(2,"Matheus",2)
-    filmeTEsT3 = Filme(3,"Erik",2)
-    filmeTEsT4 = Filme(4,"Gabriel",2)    
-    vetor1 = [filmeTEsT,filmeTEsT2]
-    vetor2 = [filmeTEsT3,filmeTEsT4]
-    dicionario = {1: vetor1,2:vetor2}
+    # filmeTEsT = Filme(1,"Aldo",2)
+    # filmeTEsT2 = Filme(2,"Matheus",2)
+    # filmeTEsT3 = Filme(3,"Erik",2)
+    # filmeTEsT4 = Filme(4,"Gabriel",2)    
+    # vetor1 = [filmeTEsT,filmeTEsT2]
+    # vetor2 = [filmeTEsT3,filmeTEsT4]
+    # dicionario = {1: vetor1,2:vetor2}
 
     inicio = time.time()
     geradorDeMatriz = geradorDeMatriz(dataFilme,dataUsuarios)
@@ -22,9 +22,12 @@ if __name__ == "__main__":
     idDoUsuario = input("Digite o id do usuario que deseja buscar os filmes melhores avaliados: ")
     dicionarioDeFilmesMelhoresAvaliados = geradorDeMatriz.retornaFilmesComMaiorNota(idDoUsuario)
     categoriasMelhoresAvaliadas = geradorDeMatriz.retornarCategoriasMelhoresAvaliadas(dicionarioDeFilmesMelhoresAvaliados)
-    
-    for i in categoriasMelhoresAvaliadas:
+    dicionarioDeFilmesRecomendados = geradorDeMatriz.recomendarFilmesParaOUsuario(categoriasMelhoresAvaliadas,dicionarioDeFilmesMelhoresAvaliados)
+
+    for i in dicionarioDeFilmesRecomendados:
         pprint(i)
+        for y in dicionarioDeFilmesRecomendados[i]:
+            pprint(str(y))
 
     temp = fim - inicio
     hours = temp//3600
