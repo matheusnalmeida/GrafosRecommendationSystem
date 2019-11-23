@@ -5,19 +5,24 @@ import random
 
 class SistemaDeRecomendacao:
 
-    def __init__(self,arquivoDeFilmes,arquivoDeNotas):
-        self.dicionarioDeFilmePorIdC ,self.dicionarioDeFilmesPorCategoriaC = self.__gerarListaDeFilmes__(pd.DataFrame(arquivoDeFilmes))
+    def __init__(self,arquivoDeFilmes,arquivoDeLinks,arquivoDeNotas):
+        self.dicionarioDeFilmePorIdC ,self.dicionarioDeFilmesPorCategoriaC = self.__gerarListaDeFilmes__(pd.DataFrame(arquivoDeFilmes),pd.DataFrame(arquivoDeLinks))
         self.dicionarioDeUsuariosC = self.__gerarListaDeUsuarios__(pd.DataFrame(arquivoDeNotas))
                 
     #Metodo responsavel por gerar o dicionario e lista de Filmes
-    def __gerarListaDeFilmes__(self,dataFrameDeFilmes):
+    '''
+    O dataframe de filmes sera utilizado para se retornar o nome do filme, suas categorias e o seu id pelo csv, 
+    já o dataframe de links sera utilizado para retornar o link do respectivom filme no site do imdb
+    '''
+    def __gerarListaDeFilmes__(self,dataFrameDeFilmes,dataFrameDeLinks):
       dicionarioDeFilmesPorId = dict()
       dicionarioDeFilmesPorCategoria = dict() 
       for linha in range(0,len(dataFrameDeFilmes)):
         idDoFilme = str(dataFrameDeFilmes.loc[linha][0])
+        idImdbDoFilme = str(int(dataFrameDeLinks.loc[linha][1]))
         nomedoFilme = dataFrameDeFilmes.loc[linha][1]
         vetorDeCategorias = dataFrameDeFilmes.loc[linha][2].split("|")
-        novoFilme = Filme(idDoFilme,nomedoFilme,vetorDeCategorias)
+        novoFilme = Filme(idDoFilme,idImdbDoFilme,nomedoFilme,vetorDeCategorias)
         #Verificando vetor de categorias para que sejam adicionadas no dicionario de filme por categoria
         for categoria in vetorDeCategorias:
           if categoria in dicionarioDeFilmesPorCategoria:

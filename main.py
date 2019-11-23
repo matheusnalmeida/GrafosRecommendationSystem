@@ -7,8 +7,9 @@ from pprint import pprint
 if __name__ == "__main__":
     dataFilme = pd.read_csv("ml-latest-small\\movies.csv") 
     dataUsuarios =  pd.read_csv("ml-latest-small\\ratings.csv") 
+    dataDeLinks = pd.read_csv("ml-latest-small\\links.csv") 
     inicio = time.time()
-    sistemaDeRecomendacao = SistemaDeRecomendacao(dataFilme,dataUsuarios)
+    sistemaDeRecomendacao = SistemaDeRecomendacao(dataFilme,dataDeLinks,dataUsuarios)
     fim = time.time()
 
     temp = fim - inicio
