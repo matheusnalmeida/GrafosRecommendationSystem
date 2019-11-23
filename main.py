@@ -19,22 +19,23 @@ if __name__ == "__main__":
     geradorDeMatriz = geradorDeMatriz(dataFilme,dataUsuarios)
     fim = time.time()
 
-    idDoUsuario = input("Digite o id do usuario que deseja buscar os filmes melhores avaliados: ")
-    dicionarioDeFilmesMelhoresAvaliados = geradorDeMatriz.retornaFilmesComMaiorNota(idDoUsuario)
-    categoriasMelhoresAvaliadas = geradorDeMatriz.retornarCategoriasMelhoresAvaliadas(dicionarioDeFilmesMelhoresAvaliados)
-    dicionarioDeFilmesRecomendados = geradorDeMatriz.recomendarFilmesParaOUsuario(categoriasMelhoresAvaliadas,dicionarioDeFilmesMelhoresAvaliados)
-
-    for i in dicionarioDeFilmesRecomendados:
-        pprint(i)
-        for y in dicionarioDeFilmesRecomendados[i]:
-            pprint(str(y))
-
     temp = fim - inicio
     hours = temp//3600
     temp = temp - 3600*hours
     minutes = temp//60
     seconds = temp - 60*minutes
     print('%d:%d:%d' %(hours,minutes,seconds))
+
+    while(True):
+        idDoUsuario = input("Digite o id do usuario que deseja buscar os filmes melhores avaliados: ")
+        dicionarioDeFilmesRecomendados = geradorDeMatriz.recomendarFilmesParaUsuario(idDoUsuario)
+
+        for i in dicionarioDeFilmesRecomendados:
+            pprint(i)
+            for y in dicionarioDeFilmesRecomendados[i]:
+                pprint(str(y))
+
+
 
     #listaDeFilmes = []
     # listaDeFilmes.append(filmeTEsT)

@@ -1,7 +1,7 @@
-import numpy as np
 from filme import Filme
 from usuario import Usuario
 import pandas as pd
+import random
 
 class geradorDeMatriz:
 
@@ -49,9 +49,19 @@ class geradorDeMatriz:
               
       return listaDeUsuarios,dicionarioDeUsuarios
 
+    #Metodo responsavel por informar se o filme passado por parametro deve ser ou nao recomendado para o usuario com o respextivo id informado
+    # def verificarSeFilmeDeveSerRecomendado(self,)
+    #   listaDeFilmesASerem
+
+    def recomendarFilmesParaUsuario(self,idDoUsuario):
+      dicionarioDeFilmesComMaiorNota = self.retornaFilmesComMaiorNota(idDoUsuario)
+      dicionarioDeCategoriasMelhoresAvaliadas = self.retornarCategoriasMelhoresAvaliadas(dicionarioDeFilmesComMaiorNota)
+      filmesASeremRecomendados = self.retornarFilmesASeremRecomendadosPorCategoria(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeElementosPorCategoria = 6)
+
+      return filmesASeremRecomendados
+
     def retornaFilmesComMaiorNota(self,idDoUsuario):
       #Retornando o usuario com o respectivo id e retornando o seu dicionario de filmes 
-      #print(self.dicionarioDeUsuariosC)
       usuario = self.dicionarioDeUsuariosC.get(idDoUsuario)
       dicionarioDeFilmesAvaliados = usuario.getDicionarioDeFilmes()
       
@@ -84,15 +94,32 @@ class geradorDeMatriz:
       return dicionarioDeCategoriasMelhoresAvaliadas
 
     #Metodo responsavel por retornar o dicionario contendo os filmes a serem recomendados dividados por categorias
-    def recomendarFilmesParaOUsuario(self,dicionarioDeCategoriasMelhoresAvaliadas,dicionarioDasNotas):
+    def retornarFilmesASeremRecomendadosPorCategoria(self,dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeElementosPorCategoria = None):
+      '''
+      Caso a quantidade de filmes por genero a ser recomendada nao seja passada por parametro, serao retornados o maximo possivel 
+      de elementos por categoria
+      '''
+      if (quantidadeDeElementosPorCategoria == None):
+        quantidadeDeElementosPorCategoria = len(self.dicionarioDeFilmePorIdC)
+
       dicionarioDeFilmesASeremRecomendados = dict()
+      '''
+      Sera criada uma copia do dicionario de filmes para que assim os filmes possam ser escolhidos de maneira aleatoria e 
+      removidos do vetor sem que se altere o vetor original
+      '''
+      dicionarioDeFilmesPorIdCopia = self.dicionarioDeFilmePorIdC.copy()
+  
       #Iniciando o diciomnario de filmes a serem recomendados com a chave de cada categoria e uma lista de filmes em cada posicao
       for categoria in dicionarioDeCategoriasMelhoresAvaliadas:
         dicionarioDeFilmesASeremRecomendados[categoria] = list()
 
       #Serao percorridos todos os filmes que estao cadastrados no sistema
-      for i in self.dicionarioDeFilmePorIdC:
-        filmeAtual = self.dicionarioDeFilmePorIdC[i]   
+      while(len(dicionarioDeFilmesPorIdCopia) != 0):
+        #Sera entao escolhido um filme de id randomico, sendo o mesmo salvo e removido do dicionario copia de filmes
+        idDoFilmeAtual = random.choice(list(dicionarioDeFilmesPorIdCopia.keys()))
+        filmeAtual = dicionarioDeFilmesPorIdCopia[idDoFilmeAtual]   
+        dicionarioDeFilmesPorIdCopia.pop(idDoFilmeAtual)
+
         #Com isso sera verificado se o filme possui genero(s) em comum com algum dos generos melhores avaliados pelo usuario  
         listaDeGenerosEmComum = self.__verificaCategoriasSimilares__(dicionarioDeCategoriasMelhoresAvaliadas,filmeAtual.getListaDeGeneros())  
         if len(listaDeGenerosEmComum) > 0:
@@ -101,19 +128,21 @@ class geradorDeMatriz:
           respectiva categoria ja possui a quantidade maxima de filmes a serem recomendados(nesse caso serao 6)
           '''
           for genero in listaDeGenerosEmComum:
-            if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != 6):
+            if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != quantidadeDeElementosPorCategoria):
               dicionarioDeFilmesASeremRecomendados[genero].append(filmeAtual)
+              break
     
       return dicionarioDeFilmesASeremRecomendados
+
     '''
     Metodo responsavel por dada uma lista de categorias melhores avaliadas por um determinado usuario e 
     uma lista de categorias de determinado filme, o mesmo ira retornar um vetor contendo as categorias do filme atual que sao comuns
     com as categorias mais bem avaliadas pelo usuario.
     '''
-    def __verificaCategoriasSimilares__(self,listaDeCategoriasMelhoresAvaliadasUsuario,listaDeCategoriasFilmeAtual):
+    def __verificaCategoriasSimilares__(self,dicionarioDeCategoriasMelhoresAvaliadas,listaDeCategoriasFilmeAtual):
       vetorDeCategoriasEmComum = list()
       for categoria in listaDeCategoriasFilmeAtual:
-        if categoria in listaDeCategoriasMelhoresAvaliadasUsuario:
+        if categoria in dicionarioDeCategoriasMelhoresAvaliadas:
           vetorDeCategoriasEmComum.append(categoria)
       
       return vetorDeCategoriasEmComum
