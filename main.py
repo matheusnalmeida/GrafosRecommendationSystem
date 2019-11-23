@@ -1,5 +1,5 @@
 import pandas as pd
-from geradorDeMatriz import geradorDeMatriz
+from sistema_de_recomendacao import SistemaDeRecomendacao
 import time
 from filme import Filme
 from pprint import pprint
@@ -7,16 +7,8 @@ from pprint import pprint
 if __name__ == "__main__":
     dataFilme = pd.read_csv("ml-latest-small\\movies.csv") 
     dataUsuarios =  pd.read_csv("ml-latest-small\\ratings.csv") 
-    # filmeTEsT = Filme(1,"Aldo",2)
-    # filmeTEsT2 = Filme(2,"Matheus",2)
-    # filmeTEsT3 = Filme(3,"Erik",2)
-    # filmeTEsT4 = Filme(4,"Gabriel",2)    
-    # vetor1 = [filmeTEsT,filmeTEsT2]
-    # vetor2 = [filmeTEsT3,filmeTEsT4]
-    # dicionario = {1: vetor1,2:vetor2}
-
     inicio = time.time()
-    geradorDeMatriz = geradorDeMatriz(dataFilme,dataUsuarios)
+    sistemaDeRecomendacao = SistemaDeRecomendacao(dataFilme,dataUsuarios)
     fim = time.time()
 
     temp = fim - inicio
@@ -28,24 +20,13 @@ if __name__ == "__main__":
 
     while(True):
         idDoUsuario = input("Digite o id do usuario que deseja buscar os filmes melhores avaliados: ")
-        dicionarioDeFilmesRecomendados = geradorDeMatriz.recomendarFilmesParaUsuario(idDoUsuario)
+        dicionarioDeFilmesRecomendados = sistemaDeRecomendacao.recomendarFilmesParaUsuario(idDoUsuario)
 
         for i in dicionarioDeFilmesRecomendados:
             pprint(i)
             for y in dicionarioDeFilmesRecomendados[i]:
                 pprint(str(y))
 
+        idDoFilme = input("Digite o id do filme a ser recomendado: ")
+        pprint(sistemaDeRecomendacao.verificarSeFilmeDeveSerRecomendado(idDoUsuario,idDoFilme))
 
-
-    #listaDeFilmes = []
-    # listaDeFilmes.append(filmeTEsT)
-    # listaDeFilmes.append(filmeTEsT2)
-    # print(str(listaDeFilmes))
-    # dataNotas = pd.read_csv("ml-latest-small\\ratings.csv")
-
-    # matrizDeAdjacencia = geradorDeMatriz.gerarMatrizDeAdjacencia()]
-    # df = pd.DataFrame(dataUsuarios)
-    # print(df)
-    # vetorCategorias = dataFilme.loc
-    # for posicao in range(0,len(df)):
-    #     print(df.loc[posicao][0])

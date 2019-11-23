@@ -3,20 +3,18 @@ from usuario import Usuario
 import pandas as pd
 import random
 
-class geradorDeMatriz:
+class SistemaDeRecomendacao:
 
     def __init__(self,arquivoDeFilmes,arquivoDeNotas):
-        #Foram criados um dicionario e lista para cada entidade para que se torne mais rapida a busca e a leitura de dados
-        self.listaDeFilmesC , self.dicionarioDeFilmePorIdC ,self.dicionarioDeFilmesPorCategoriaC = self.__gerarListaDeFilmes__(pd.DataFrame(arquivoDeFilmes))
-        self.listaDeUsuariosC, self.dicionarioDeUsuariosC = self.__gerarListaDeUsuarios__(pd.DataFrame(arquivoDeNotas))
+        self.dicionarioDeFilmePorIdC ,self.dicionarioDeFilmesPorCategoriaC = self.__gerarListaDeFilmes__(pd.DataFrame(arquivoDeFilmes))
+        self.dicionarioDeUsuariosC = self.__gerarListaDeUsuarios__(pd.DataFrame(arquivoDeNotas))
                 
     #Metodo responsavel por gerar o dicionario e lista de Filmes
     def __gerarListaDeFilmes__(self,dataFrameDeFilmes):
-      listaDeFilmes = list()
       dicionarioDeFilmesPorId = dict()
       dicionarioDeFilmesPorCategoria = dict() 
       for linha in range(0,len(dataFrameDeFilmes)):
-        idDoFilme = dataFrameDeFilmes.loc[linha][0]
+        idDoFilme = str(dataFrameDeFilmes.loc[linha][0])
         nomedoFilme = dataFrameDeFilmes.loc[linha][1]
         vetorDeCategorias = dataFrameDeFilmes.loc[linha][2].split("|")
         novoFilme = Filme(idDoFilme,nomedoFilme,vetorDeCategorias)
@@ -26,18 +24,17 @@ class geradorDeMatriz:
             dicionarioDeFilmesPorCategoria[categoria].append(novoFilme)
           else:
             dicionarioDeFilmesPorCategoria[categoria] = [novoFilme]
-        listaDeFilmes.append(novoFilme)
         dicionarioDeFilmesPorId[idDoFilme] = novoFilme
-
-      return listaDeFilmes,dicionarioDeFilmesPorId,dicionarioDeFilmesPorCategoria
+      
+      return dicionarioDeFilmesPorId,dicionarioDeFilmesPorCategoria
     
     #Metodo responsavel por gerar o dicionario e lista de Usuarios
     def __gerarListaDeUsuarios__(self,dataFrameDeNotas):
-      listaDeUsuarios = list()
       dicionarioDeUsuarios = dict()
       for linha in range(0,len(dataFrameDeNotas)):
         idDoUsuario = str(int(dataFrameDeNotas.loc[linha][0]))
-        filmeDoUsuario = self.dicionarioDeFilmePorIdC.get(dataFrameDeNotas.loc[linha][1])
+        idDoFilme = str(int(dataFrameDeNotas.loc[linha][1]))
+        filmeDoUsuario = self.dicionarioDeFilmePorIdC.get(idDoFilme)
         notaDoFilme = dataFrameDeNotas.loc[linha][2]
         if idDoUsuario in dicionarioDeUsuarios:
           dicionarioDeUsuarios.get(idDoUsuario).insereFilmeAvaliado(filmeDoUsuario,notaDoFilme)
@@ -45,26 +42,42 @@ class geradorDeMatriz:
           novoUsuario = Usuario(idDoUsuario)
           novoUsuario.insereFilmeAvaliado(filmeDoUsuario,notaDoFilme)
           dicionarioDeUsuarios[idDoUsuario] = novoUsuario
-          listaDeUsuarios.append(novoUsuario)
               
-      return listaDeUsuarios,dicionarioDeUsuarios
+      return dicionarioDeUsuarios
 
     #Metodo responsavel por informar se o filme passado por parametro deve ser ou nao recomendado para o usuario com o respextivo id informado
-    # def verificarSeFilmeDeveSerRecomendado(self,)
-    #   listaDeFilmesASerem
+    def verificarSeFilmeDeveSerRecomendado(self,idDoUsuario,idDoFilme):
+      dicionarioDeFilmesASeremRecomendados = self.recomendarFilmesParaUsuario(idDoUsuario,quantidadeDeFilmesPorCategoria = len(self.dicionarioDeFilmePorIdC))
+      #Verificando se o filme com o respectivo id informado esta na lista de possiveis filmes que o usuario ira gostar
+      for categoria in dicionarioDeFilmesASeremRecomendados:
+        for filmeAtual in dicionarioDeFilmesASeremRecomendados[categoria]:
+          if filmeAtual.getId() == idDoFilme:
+            return True
+      
+      return False
 
-    def recomendarFilmesParaUsuario(self,idDoUsuario):
-      dicionarioDeFilmesComMaiorNota = self.retornaFilmesComMaiorNota(idDoUsuario)
-      dicionarioDeCategoriasMelhoresAvaliadas = self.retornarCategoriasMelhoresAvaliadas(dicionarioDeFilmesComMaiorNota)
-      filmesASeremRecomendados = self.retornarFilmesASeremRecomendadosPorCategoria(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeElementosPorCategoria = 6)
+    #METODO PRINCIPAL RESPONSAVEL POR RETORNAR O DICIONARIO DE FILMES DIVIDIDOS POR CATEGORIA QUE SERAO RECOMENDADOS AO USUARIO
+    def recomendarFilmesParaUsuario(self,idDoUsuario,quantidadeDeFilmesPorCategoria = None):
+      #Caso a quantidade de filmes por categoria a ser recomendada nao seja passada por parametro, serao retornados 6 elementos por categoria
+      if quantidadeDeFilmesPorCategoria == None:
+        quantidadeDeFilmesPorCategoria = 6
+
+      dicionarioDeFilmesComMaiorNota = self.__retornaFilmesComMaiorNota__(idDoUsuario)
+      dicionarioDeCategoriasMelhoresAvaliadas = self.__retornarCategoriasMelhoresAvaliadas__(dicionarioDeFilmesComMaiorNota)
+      filmesASeremRecomendados = self.__retornarFilmesASeremRecomendadosPorCategoria__(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria = quantidadeDeFilmesPorCategoria)
 
       return filmesASeremRecomendados
 
-    def retornaFilmesComMaiorNota(self,idDoUsuario):
+    '''
+    Metodo responsavel por retornar um dicionario contendo tres chaves que serao as tres maiores notas dadas aos filmes
+    e os respectivos filmes que possuem cada uma das notas
+    '''   
+    def __retornaFilmesComMaiorNota__(self,idDoUsuario):
       #Retornando o usuario com o respectivo id e retornando o seu dicionario de filmes 
       usuario = self.dicionarioDeUsuariosC.get(idDoUsuario)
-      dicionarioDeFilmesAvaliados = usuario.getDicionarioDeFilmes()
       
+      dicionarioDeFilmesAvaliados = usuario.getDicionarioDeFilmes()
+
       #Retornando o vetor de filmes avaliados na ordem decrescente para que sejam retornados as tres maiores avaliacoes
       vetorDeNotas = list(dicionarioDeFilmesAvaliados.keys())
       vetorDeNotas = sorted(vetorDeNotas,reverse=True)
@@ -80,7 +93,7 @@ class geradorDeMatriz:
     Metodo responsavel por retornar as categorias dos filmes mellhores avaliados por um determinado usuario. Sera passado como parametro
     o dicionario dos filmes melhores avaliados por um determinado usuario.
     '''
-    def retornarCategoriasMelhoresAvaliadas(self,dicionarioDasNotas):
+    def __retornarCategoriasMelhoresAvaliadas__(self,dicionarioDasNotas):
       dicionarioDeCategoriasMelhoresAvaliadas = dict()
       for i in dicionarioDasNotas:
         for filme in dicionarioDasNotas.get(i):
@@ -94,14 +107,7 @@ class geradorDeMatriz:
       return dicionarioDeCategoriasMelhoresAvaliadas
 
     #Metodo responsavel por retornar o dicionario contendo os filmes a serem recomendados dividados por categorias
-    def retornarFilmesASeremRecomendadosPorCategoria(self,dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeElementosPorCategoria = None):
-      '''
-      Caso a quantidade de filmes por genero a ser recomendada nao seja passada por parametro, serao retornados o maximo possivel 
-      de elementos por categoria
-      '''
-      if (quantidadeDeElementosPorCategoria == None):
-        quantidadeDeElementosPorCategoria = len(self.dicionarioDeFilmePorIdC)
-
+    def __retornarFilmesASeremRecomendadosPorCategoria__(self,dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria):
       dicionarioDeFilmesASeremRecomendados = dict()
       '''
       Sera criada uma copia do dicionario de filmes para que assim os filmes possam ser escolhidos de maneira aleatoria e 
@@ -128,7 +134,7 @@ class geradorDeMatriz:
           respectiva categoria ja possui a quantidade maxima de filmes a serem recomendados(nesse caso serao 6)
           '''
           for genero in listaDeGenerosEmComum:
-            if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != quantidadeDeElementosPorCategoria):
+            if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != quantidadeDeFilmesPorCategoria):
               dicionarioDeFilmesASeremRecomendados[genero].append(filmeAtual)
               break
     
@@ -157,10 +163,5 @@ class geradorDeMatriz:
 
       return False
 
-    def getDicionarioDeFilmes(self):
-      return self.dicionarioDeFilmePorIdC
-    
-    def getDicionarioDeUsuarios(self):
-      return self.dicionarioDeUsuariosC
 
       

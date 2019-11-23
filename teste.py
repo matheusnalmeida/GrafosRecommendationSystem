@@ -1,13 +1,7 @@
-from pprint import pprint
-import random
+import pandas as pd
 
-if __name__ == "__main__":
-    dicionario = {1: "ALdoViado",2: "Matheus",3: "Erik"}
-    dicionario2 = dicionario.copy()
-
-    while (len(dicionario2) != 0):
-        valor = random.choice(list(dicionario2.keys()))
-        pprint(valor)
-        dicionario2.pop(valor)
-    pprint(dicionario)
-    pprint(dicionario2)
+dataFilme = pd.read_csv("ml-latest-small\\movies.csv") 
+variavel = pd.DataFrame(dataFilme).loc[0][0]
+variavel = str(variavel)
+if "1" == "1.0":
+    print(type(variavel))

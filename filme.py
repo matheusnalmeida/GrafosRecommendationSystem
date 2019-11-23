@@ -6,7 +6,10 @@ class Filme:
 
     def getListaDeGeneros(self):
         return self.genero
-        
+    
+    def getId(self):
+        return self.id
+
     def __str__(self):
         return self.nomeDoFilme
     
