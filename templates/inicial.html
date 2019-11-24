@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+<html>
+
+<head>
+    <title>
+        Pagina inicial
+    </title>
+</head>
+
+<body style="background: black;">
+    <form action="/" method="post" name="formInputId" id="formInputId">
+        <div class="container" style="text-align: right;">
+            <div style="text-align:center;margin-top: 100px">
+                <img id="imagemInicial" alt="Logo Outliers" className="mt-5 mb-4" src="https://img.ibxk.com.br/2019/11/12/12113528567078.jpg?w=1120&amp;h=420&amp;mode=crop&amp;scale=both" width="700px" height="200px"></img>
+            </div>
+            <!-- <div>
+                <img src="something.jpg" alt="" />
+                <h1 style="text-align: center; margin-top: 200px; height: min-content;color: brown;">Recomendador De Filmes</h1>
+            </div> -->
+            <div style="margin-top: 200px;">
+                <input id="inputUrl" type="text" name="imdbCode" value="" class="form-control"
+                    style="border: 2px solid yellow;" placeholder="Digite o id do usuario aqui" />
+            </div>
+            <button class="btn btn-dark" type="submit" value="submit" onclick=changeActionForm()
+                style="margin-top: 20px;">
+                Enviar
+            </button>
+        </div>
+    </form>
+    <script>
+        function changeActionForm() {
+            document.formInputId.action = "/listarFilme/" + document.getElementById("inputUrl").value
+        }
+    </script>
+</body>
+
+</html>

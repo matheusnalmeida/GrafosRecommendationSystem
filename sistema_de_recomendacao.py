@@ -18,8 +18,8 @@ class SistemaDeRecomendacao:
       dicionarioDeFilmesPorId = dict()
       dicionarioDeFilmesPorCategoria = dict() 
       for linha in range(0,len(dataFrameDeFilmes)):
-        idDoFilme = str(dataFrameDeFilmes.loc[linha][0])
-        idImdbDoFilme = str(int(dataFrameDeLinks.loc[linha][1]))
+        idDoFilme = dataFrameDeFilmes.loc[linha][0]
+        idImdbDoFilme = dataFrameDeLinks.loc[linha][1]
         nomedoFilme = dataFrameDeFilmes.loc[linha][1]
         vetorDeCategorias = dataFrameDeFilmes.loc[linha][2].split("|")
         novoFilme = Filme(idDoFilme,idImdbDoFilme,nomedoFilme,vetorDeCategorias)
@@ -37,8 +37,8 @@ class SistemaDeRecomendacao:
     def __gerarListaDeUsuarios__(self,dataFrameDeNotas):
       dicionarioDeUsuarios = dict()
       for linha in range(0,len(dataFrameDeNotas)):
-        idDoUsuario = str(int(dataFrameDeNotas.loc[linha][0]))
-        idDoFilme = str(int(dataFrameDeNotas.loc[linha][1]))
+        idDoUsuario = dataFrameDeNotas.loc[linha][0]
+        idDoFilme = dataFrameDeNotas.loc[linha][1]
         filmeDoUsuario = self.dicionarioDeFilmePorIdC.get(idDoFilme)
         notaDoFilme = dataFrameDeNotas.loc[linha][2]
         if idDoUsuario in dicionarioDeUsuarios:

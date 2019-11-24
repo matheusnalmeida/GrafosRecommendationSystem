@@ -14,6 +14,9 @@ class Filme:
     def getImdbID(self):
         return self.imdbID
 
+    def getNomeDoFilme(self):
+        return self.nomeDoFilme
+        
     def __str__(self):
         return self.nomeDoFilme
     
