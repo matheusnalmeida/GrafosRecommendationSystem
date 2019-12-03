@@ -3,19 +3,16 @@ from sistema_de_recomendacao import SistemaDeRecomendacao
 from flask import render_template, request, Flask, render_template_string
 import os
 import json
-from processa_filme import ProcessaImagem
 import numpy as np
-
 if __name__ == "__main__":
 
     app = Flask(__name__)
 
     print("Iniciando Leitura De Arquivos ...")
-    dataFilme = pd.read_csv("ml-latest-small\\movies.csv",dtype=np.str) 
-    dataUsuarios =  pd.read_csv("ml-latest-small\\ratings.csv",dtype=np.str) 
-    dataDeLinks = pd.read_csv("ml-latest-small\\links.csv",dtype=np.str) 
+    dataFilme = pd.read_csv("..\\ml-latest-small\\movies.csv",dtype=np.str) 
+    dataUsuarios =  pd.read_csv("..\\ml-latest-small\\ratings.csv",dtype=np.str) 
+    dataDeLinks = pd.read_csv("..\\ml-latest-small\\links.csv",dtype=np.str) 
     sistemaDeRecomendacao = SistemaDeRecomendacao(dataFilme,dataDeLinks,dataUsuarios)
-    processaFilme = ProcessaImagem()
     print("Leitura de arquivos finalizada.")
 
     @app.after_request
@@ -31,20 +28,14 @@ if __name__ == "__main__":
     
     @app.route("/listarFilme/<id>",methods=['POST'])
     def pagina_de_recomendacao(id):
-        dicionarioDeFilmesPorCategoria,listaDeIdsFilmes = sistemaDeRecomendacao.recomendarFilmesParaUsuario(id,quantidadeDeFilmesPorCategoria=3)
+        dicionarioDeFilmesPorCategoria = sistemaDeRecomendacao.recomendarFilmesParaUsuario(id,quantidadeDeFilmesPorCategoria=3)
         listaDeImagens = list()
 
-        for id in listaDeIdsFilmes:
-            listaDeImagens.append(processaFilme.retornaLinkImagem(id))
-
-        print("dale")
-        posicaoImagem = 0
         dicionarioDeFilmesFinal = {}
         for categoria in dicionarioDeFilmesPorCategoria:
             dicionarioDeFilmesFinal[categoria] = list()
             for filme in dicionarioDeFilmesPorCategoria[categoria]:
-                dicionarioDeFilmesFinal[categoria].append({filme.getNomeDoFilme(): listaDeImagens[posicaoImagem]})
-                posicaoImagem += 1
+                dicionarioDeFilmesFinal[categoria].append({filme.getNomeDoFilme(): filme.getLinkDaImagem()})
 
         return render_template("paginaDeFilmes.html",dicionarioDeFilmes=dicionarioDeFilmesFinal)
 

@@ -19,6 +19,10 @@ class DataBase:
     def get_movies_by_id(self,id):
         self.c.execute("SELECT * FROM Movie WHERE id=:id", {'id': id})
         return self.c.fetchall()
+    
+    def get_all_movies(self):
+        self.c.execute("SELECT * FROM Movie")
+        return self.c.fetchall()
 
     def remove_movies(self,id):
         with self.conn:
@@ -40,6 +44,10 @@ class DataBase:
 
     def get_movies_by_id_invalid(self,id):
         self.c.execute("SELECT * FROM InvalidMovies WHERE id=:id", {'id': id})
+        return self.c.fetchall()
+    
+    def get_all_invalid_movies(self):
+        self.c.execute("SELECT * FROM InvalidMovies")
         return self.c.fetchall()
 
     def remove_movies_invalid(self,id):

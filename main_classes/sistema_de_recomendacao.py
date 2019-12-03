@@ -1,15 +1,19 @@
+import sys
+sys.path.append('..')
 from filme import Filme
 from usuario import Usuario
 import pandas as pd
 import random
 from progress.bar import Bar
+from dataBase_generator.bancoDeDadosSQLlite import DataBase
 
 class SistemaDeRecomendacao:
 
     def __init__(self,arquivoDeFilmes,arquivoDeLinks,arquivoDeNotas):
+        self.dataBase = DataBase()
         self.dicionarioDeFilmePorIdC ,self.dicionarioDeFilmesPorCategoriaC = self.__gerarListaDeFilmes__(pd.DataFrame(arquivoDeFilmes),pd.DataFrame(arquivoDeLinks))
         self.dicionarioDeUsuariosC = self.__gerarListaDeUsuarios__(pd.DataFrame(arquivoDeNotas))
-                
+
     #Metodo responsavel por gerar o dicionario e lista de Filmes
     '''
     O dataframe de filmes sera utilizado para se retornar o nome do filme, suas categorias e o seu id pelo csv, 
@@ -18,12 +22,17 @@ class SistemaDeRecomendacao:
     def __gerarListaDeFilmes__(self,dataFrameDeFilmes,dataFrameDeLinks):
       dicionarioDeFilmesPorId = dict()
       dicionarioDeFilmesPorCategoria = dict() 
+      dicionarioDeFilmesInvalidos = dict(self.dataBase.get_all_invalid_movies())
       for linha in range(0,len(dataFrameDeFilmes)):
         idDoFilme = dataFrameDeFilmes.loc[linha][0]
+        #Vericando se o o filme possui um id invalido(Filme Inexistente no IMDB)
+        if (idDoFilme in dicionarioDeFilmesInvalidos):
+          continue
         idImdbDoFilme = dataFrameDeLinks.loc[linha][1]
         nomedoFilme = dataFrameDeFilmes.loc[linha][1]
+        linkImagemDoFilme = self.dataBase.get_movies_by_id(idDoFilme)[0][1]
         vetorDeCategorias = dataFrameDeFilmes.loc[linha][2].split("|")
-        novoFilme = Filme(idDoFilme,idImdbDoFilme,nomedoFilme,vetorDeCategorias)
+        novoFilme = Filme(idDoFilme,idImdbDoFilme,nomedoFilme,linkImagemDoFilme,vetorDeCategorias)
         #Verificando vetor de categorias para que sejam adicionadas no dicionario de filme por categoria
         for categoria in vetorDeCategorias:
           if categoria in dicionarioDeFilmesPorCategoria:
@@ -37,9 +46,13 @@ class SistemaDeRecomendacao:
     #Metodo responsavel por gerar o dicionario e lista de Usuarios
     def __gerarListaDeUsuarios__(self,dataFrameDeNotas):
       dicionarioDeUsuarios = dict()
+      dicionarioDeFilmesInvalidos = dict(self.dataBase.get_all_invalid_movies())
       for linha in range(0,len(dataFrameDeNotas)):
         idDoUsuario = dataFrameDeNotas.loc[linha][0]
         idDoFilme = dataFrameDeNotas.loc[linha][1]
+        #Vericando se o o filme possui um id invalido(Filme Inexistente no IMDB)
+        if (idDoFilme in dicionarioDeFilmesInvalidos):
+          continue        
         filmeDoUsuario = self.dicionarioDeFilmePorIdC.get(idDoFilme)
         notaDoFilme = dataFrameDeNotas.loc[linha][2]
         if idDoUsuario in dicionarioDeUsuarios:
@@ -71,9 +84,9 @@ class SistemaDeRecomendacao:
 
       dicionarioDeFilmesComMaiorNota = self.__retornaFilmesComMaiorNota__(idDoUsuario)
       dicionarioDeCategoriasMelhoresAvaliadas = self.__retornarCategoriasMelhoresAvaliadas__(dicionarioDeFilmesComMaiorNota)
-      filmesASeremRecomendados,listaDeIdsFilmes = self.__retornarFilmesASeremRecomendadosPorCategoria__(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria = quantidadeDeFilmesPorCategoria)
+      filmesASeremRecomendados = self.__retornarFilmesASeremRecomendadosPorCategoria__(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria = quantidadeDeFilmesPorCategoria)
 
-      return filmesASeremRecomendados,listaDeIdsFilmes
+      return filmesASeremRecomendados
 
     '''
     Metodo responsavel por retornar um dicionario contendo tres chaves que serao as tres maiores notas dadas aos filmes
@@ -125,7 +138,6 @@ class SistemaDeRecomendacao:
       #Iniciando o diciomnario de filmes a serem recomendados com a chave de cada categoria e uma lista de filmes em cada posicao
       for categoria in dicionarioDeCategoriasMelhoresAvaliadas:
         dicionarioDeFilmesASeremRecomendados[categoria] = list()
-        listaDeIds = list()
 
       #Serao percorridos todos os filmes que estao cadastrados no sistema
       while(len(dicionarioDeFilmesPorIdCopia) != 0):
@@ -144,10 +156,9 @@ class SistemaDeRecomendacao:
           for genero in listaDeGenerosEmComum:
             if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != quantidadeDeFilmesPorCategoria):
               dicionarioDeFilmesASeremRecomendados[genero].append(filmeAtual)
-              listaDeIds.append(filmeAtual.getImdbID())
               break
     
-      return dicionarioDeFilmesASeremRecomendados,listaDeIds
+      return dicionarioDeFilmesASeremRecomendados
 
     '''
     Metodo responsavel por dada uma lista de categorias melhores avaliadas por um determinado usuario e 

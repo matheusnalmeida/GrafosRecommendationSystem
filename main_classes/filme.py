@@ -1,8 +1,9 @@
 class Filme:
-    def __init__(self,id,imdbID,nomeDoFilme,generos):
+    def __init__(self,id,imdbID,nomeDoFilme,linkDaImagem,generos):
         self.id = id
         self.imdbID = imdbID
         self.nomeDoFilme = nomeDoFilme
+        self.linkDaImagem = linkDaImagem
         self.genero = generos
 
     def getListaDeGeneros(self):
@@ -16,6 +17,9 @@ class Filme:
 
     def getNomeDoFilme(self):
         return self.nomeDoFilme
+    
+    def getLinkDaImagem(self):
+        return self.linkDaImagem
         
     def __str__(self):
         return self.nomeDoFilme
