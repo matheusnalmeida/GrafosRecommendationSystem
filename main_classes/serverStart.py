@@ -31,17 +31,25 @@ if __name__ == "__main__":
     
     @app.route("/listarFilme/<id>",methods=['POST'])
     def pagina_de_recomendacao(id):
-        dicionarioDeFilmesPorCategoria = sistemaDeRecomendacao.recomendarFilmesParaUsuario(id,quantidadeDeFilmesPorCategoria=3)
-        dicionarioDeFilmesFinal = dict()
+        dicionarioDeFilmesPorCategoria,listaDeIdsFilmes = sistemaDeRecomendacao.recomendarFilmesParaUsuario(id,quantidadeDeFilmesPorCategoria=3)
+        listaDeImagens = list()
 
+        for id in listaDeIdsFilmes:
+            listaDeImagens.append(processaFilme.retornaLinkImagem(id))
+
+        print("dale")
+        posicaoImagem = 0
+        dicionarioDeFilmesFinal = {}
         for categoria in dicionarioDeFilmesPorCategoria:
             dicionarioDeFilmesFinal[categoria] = list()
             for filme in dicionarioDeFilmesPorCategoria[categoria]:
-                dicionarioDeFilmesFinal[categoria].append({filme.getNomeDoFilme(): processaFilme.retornaLinkImagem(filme.getImdbID())})
-        
+                dicionarioDeFilmesFinal[categoria].append({filme.getNomeDoFilme(): listaDeImagens[posicaoImagem]})
+                posicaoImagem += 1
+
         return render_template("paginaDeFilmes.html",dicionarioDeFilmes=dicionarioDeFilmesFinal)
 
     app.debug = False
     host = os.environ.get('IP', '0.0.0.0')
     port = int(os.environ.get('PORT', 8080))
     app.run(host=host, port=port)
+

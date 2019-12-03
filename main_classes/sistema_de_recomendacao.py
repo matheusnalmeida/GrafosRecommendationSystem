@@ -2,6 +2,7 @@ from filme import Filme
 from usuario import Usuario
 import pandas as pd
 import random
+from progress.bar import Bar
 
 class SistemaDeRecomendacao:
 
@@ -30,7 +31,7 @@ class SistemaDeRecomendacao:
           else:
             dicionarioDeFilmesPorCategoria[categoria] = [novoFilme]
         dicionarioDeFilmesPorId[idDoFilme] = novoFilme
-      
+
       return dicionarioDeFilmesPorId,dicionarioDeFilmesPorCategoria
     
     #Metodo responsavel por gerar o dicionario e lista de Usuarios
@@ -49,6 +50,7 @@ class SistemaDeRecomendacao:
           dicionarioDeUsuarios[idDoUsuario] = novoUsuario
               
       return dicionarioDeUsuarios
+    
 
     #Metodo responsavel por informar se o filme passado por parametro deve ser ou nao recomendado para o usuario com o respextivo id informado
     def verificarSeFilmeDeveSerRecomendado(self,idDoUsuario,idDoFilme):
@@ -69,9 +71,9 @@ class SistemaDeRecomendacao:
 
       dicionarioDeFilmesComMaiorNota = self.__retornaFilmesComMaiorNota__(idDoUsuario)
       dicionarioDeCategoriasMelhoresAvaliadas = self.__retornarCategoriasMelhoresAvaliadas__(dicionarioDeFilmesComMaiorNota)
-      filmesASeremRecomendados = self.__retornarFilmesASeremRecomendadosPorCategoria__(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria = quantidadeDeFilmesPorCategoria)
+      filmesASeremRecomendados,listaDeIdsFilmes = self.__retornarFilmesASeremRecomendadosPorCategoria__(dicionarioDeCategoriasMelhoresAvaliadas,quantidadeDeFilmesPorCategoria = quantidadeDeFilmesPorCategoria)
 
-      return filmesASeremRecomendados
+      return filmesASeremRecomendados,listaDeIdsFilmes
 
     '''
     Metodo responsavel por retornar um dicionario contendo tres chaves que serao as tres maiores notas dadas aos filmes
@@ -123,6 +125,7 @@ class SistemaDeRecomendacao:
       #Iniciando o diciomnario de filmes a serem recomendados com a chave de cada categoria e uma lista de filmes em cada posicao
       for categoria in dicionarioDeCategoriasMelhoresAvaliadas:
         dicionarioDeFilmesASeremRecomendados[categoria] = list()
+        listaDeIds = list()
 
       #Serao percorridos todos os filmes que estao cadastrados no sistema
       while(len(dicionarioDeFilmesPorIdCopia) != 0):
@@ -141,9 +144,10 @@ class SistemaDeRecomendacao:
           for genero in listaDeGenerosEmComum:
             if (not self.contemFilme(filmeAtual,dicionarioDeCategoriasMelhoresAvaliadas[genero])) and (len(dicionarioDeFilmesASeremRecomendados[genero]) != quantidadeDeFilmesPorCategoria):
               dicionarioDeFilmesASeremRecomendados[genero].append(filmeAtual)
+              listaDeIds.append(filmeAtual.getImdbID())
               break
     
-      return dicionarioDeFilmesASeremRecomendados
+      return dicionarioDeFilmesASeremRecomendados,listaDeIds
 
     '''
     Metodo responsavel por dada uma lista de categorias melhores avaliadas por um determinado usuario e 
@@ -168,5 +172,6 @@ class SistemaDeRecomendacao:
 
       return False
 
-
+    def getHashDeFilmes(self):
+      return self.dicionarioDeFilmePorIdC
       
